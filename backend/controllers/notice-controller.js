@@ -5,9 +5,9 @@ const noticeCreate = async (req, res) => {
         const notice = new Notice({
             ...req.body,
             school: req.body.adminID
-        })
-        const result = await notice.save()
-        res.send(result)
+        });
+        const result = await notice.save();
+        res.send(result);
     } catch (err) {
         res.status(500).json(err);
     }
@@ -15,9 +15,9 @@ const noticeCreate = async (req, res) => {
 
 const noticeList = async (req, res) => {
     try {
-        let notices = await Notice.find({ school: req.params.id })
+        let notices = await Notice.find({ school: req.params.id });
         if (notices.length > 0) {
-            res.send(notices)
+            res.send(notices);
         } else {
             res.send({ message: "No notices found" });
         }
@@ -28,35 +28,37 @@ const noticeList = async (req, res) => {
 
 const updateNotice = async (req, res) => {
     try {
-        const result = await Notice.findByIdAndUpdate(req.params.id,
+        const result = await Notice.findByIdAndUpdate(
+            req.params.id,
             { $set: req.body },
-            { new: true })
-        res.send(result)
-    } catch (error) {
-        res.status(500).json(error);
+            { new: true }
+        );
+        res.send(result);
+    } catch (err) {
+        res.status(500).json(err);
     }
-}
+};
 
 const deleteNotice = async (req, res) => {
     try {
-        const result = await Notice.findByIdAndDelete(req.params.id)
-        res.send(result)
-    } catch (error) {
+        const result = await Notice.findByIdAndDelete(req.params.id);
+        res.send(result);
+    } catch (err) {
         res.status(500).json(err);
     }
-}
+};
 
 const deleteNotices = async (req, res) => {
     try {
-        const result = await Notice.deleteMany({ school: req.params.id })
+        const result = await Notice.deleteMany({ school: req.params.id });
         if (result.deletedCount === 0) {
-            res.send({ message: "No notices found to delete" })
+            res.send({ message: "No notices found to delete" });
         } else {
-            res.send(result)
+            res.send(result);
         }
-    } catch (error) {
+    } catch (err) {
         res.status(500).json(err);
     }
-}
+};
 
 module.exports = { noticeCreate, noticeList, updateNotice, deleteNotice, deleteNotices };
