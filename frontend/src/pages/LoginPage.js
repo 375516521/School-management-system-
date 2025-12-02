@@ -17,7 +17,7 @@ const LoginPage = ({ role }) => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
-    const { status, currentUser, response, error, currentRole } = useSelector(state => state.user);;
+    const { status, currentUser, response, error, currentRole } = useSelector(state => state.user);
 
     const [toggle, setToggle] = useState(false)
     const [guestLoader, setGuestLoader] = useState(false)
@@ -99,6 +99,9 @@ const LoginPage = ({ role }) => {
 
     useEffect(() => {
         if (status === 'success' || currentUser !== null) {
+            // stop loaders and navigate based on role
+            setLoader(false)
+            setGuestLoader(false)
             if (currentRole === 'Admin') {
                 navigate('/Admin/dashboard');
             }
@@ -127,6 +130,9 @@ const LoginPage = ({ role }) => {
                 <CssBaseline />
                 <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
                     <Box
+                        component="form"
+                        onSubmit={handleSubmit}
+                        noValidate
                         sx={{
                             my: 8,
                             mx: 4,
@@ -138,121 +144,114 @@ const LoginPage = ({ role }) => {
                         <Typography variant="h4" sx={{ mb: 2, color: "#2c2143" }}>
                             {role} Login
                         </Typography>
-                        <Typography variant="h7">
-                            Welcome back! Please enter your details
-                        </Typography>
-                        <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 2 }}>
-                            {role === "Student" ? (
-                                <>
-                                    <TextField
-                                        margin="normal"
-                                        required
-                                        fullWidth
-                                        id="rollNumber"
-                                        label="Enter your Roll Number"
-                                        name="rollNumber"
-                                        autoComplete="off"
-                                        type="number"
-                                        autoFocus
-                                        error={rollNumberError}
-                                        helperText={rollNumberError && 'Roll Number is required'}
-                                        onChange={handleInputChange}
-                                    />
-                                    <TextField
-                                        margin="normal"
-                                        required
-                                        fullWidth
-                                        id="studentName"
-                                        label="Enter your name"
-                                        name="studentName"
-                                        autoComplete="name"
-                                        autoFocus
-                                        error={studentNameError}
-                                        helperText={studentNameError && 'Name is required'}
-                                        onChange={handleInputChange}
-                                    />
-                                </>
-                            ) : (
+
+                        {role === "Student" ? (
+                            <>
                                 <TextField
                                     margin="normal"
                                     required
                                     fullWidth
-                                    id="email"
-                                    label="Enter your email"
-                                    name="email"
-                                    autoComplete="email"
+                                    id="rollNumber"
+                                    label="Enter your Roll Number"
+                                    name="rollNumber"
+                                    autoComplete="off"
+                                    type="number"
                                     autoFocus
-                                    error={emailError}
-                                    helperText={emailError && 'Email is required'}
+                                    error={rollNumberError}
+                                    helperText={rollNumberError && 'Roll Number is required'}
                                     onChange={handleInputChange}
                                 />
-                            )}
+                                <TextField
+                                    margin="normal"
+                                    required
+                                    fullWidth
+                                    id="studentName"
+                                    label="Enter your name"
+                                    name="studentName"
+                                    autoComplete="name"
+                                    error={studentNameError}
+                                    helperText={studentNameError && 'Name is required'}
+                                    onChange={handleInputChange}
+                                />
+                            </>
+                        ) : (
                             <TextField
                                 margin="normal"
                                 required
                                 fullWidth
-                                name="password"
-                                label="Password"
-                                type={toggle ? 'text' : 'password'}
-                                id="password"
-                                autoComplete="current-password"
-                                error={passwordError}
-                                helperText={passwordError && 'Password is required'}
+                                id="email"
+                                label="Enter your email"
+                                name="email"
+                                autoComplete="email"
+                                autoFocus
+                                error={emailError}
+                                helperText={emailError && 'Email is required'}
                                 onChange={handleInputChange}
-                                InputProps={{
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <IconButton onClick={() => setToggle(!toggle)}>
-                                                {toggle ? (
-                                                    <Visibility />
-                                                ) : (
-                                                    <VisibilityOff />
-                                                )}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    ),
-                                }}
                             />
-                            <Grid container sx={{ display: "flex", justifyContent: "space-between" }}>
-                                <FormControlLabel
-                                    control={<Checkbox value="remember" color="primary" />}
-                                    label="Remember me"
-                                />
-                                <StyledLink href="#">
-                                    Forgot password?
-                                </StyledLink>
-                            </Grid>
-                            <LightPurpleButton
-                                type="submit"
-                                fullWidth
-                                variant="contained"
-                                sx={{ mt: 3 }}
-                            >
-                                {loader ?
-                                    <CircularProgress size={24} color="inherit" />
-                                    : "Login"}
-                            </LightPurpleButton>
-                            <Button
-                                fullWidth
-                                onClick={guestModeHandler}
-                                variant="outlined"
-                                sx={{ mt: 2, mb: 3, color: "#7f56da", borderColor: "#7f56da" }}
-                            >
-                                Login as Guest
-                            </Button>
-                            {role === "Admin" &&
-                                <Grid container>
-                                    <Grid>
-                                        Don't have an account?
-                                    </Grid>
-                                    <Grid item sx={{ ml: 2 }}>
-                                        <StyledLink to="/Adminregister">
-                                            Sign up
-                                        </StyledLink>
-                                    </Grid>
+                        )}
+
+                        <TextField
+                            margin="normal"
+                            required
+                            fullWidth
+                            name="password"
+                            label="Password"
+                            type={toggle ? 'text' : 'password'}
+                            id="password"
+                            autoComplete="current-password"
+                            error={passwordError}
+                            helperText={passwordError && 'Password is required'}
+                            onChange={handleInputChange}
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton onClick={() => setToggle(!toggle)}>
+                                            {toggle ? <Visibility /> : <VisibilityOff />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                ),
+                            }}
+                        />
+
+                        <FormControlLabel
+                            control={<Checkbox value="remember" color="primary" />}
+                            label="Remember me"
+                        />
+
+                        <StyledLink to="#">
+                            Forgot password?
+                        </StyledLink>
+
+                        <LightPurpleButton
+                            type="submit"
+                            fullWidth
+                            variant="contained"
+                            sx={{ mt: 3 }}
+                        >
+                            {loader ? <CircularProgress size={24} color="inherit" /> : "Login"}
+                        </LightPurpleButton>
+
+                        <Button
+                            fullWidth
+                            onClick={guestModeHandler}
+                            variant="outlined"
+                            sx={{ mt: 2, mb: 3, color: "#7f56da", borderColor: "#7f56da" }}
+                        >
+                            Login as Guest
+                        </Button>
+
+                        {role === "Admin" &&
+                            <Grid container>
+                                <Grid item>
+                                    Don't have an account?
                                 </Grid>
-                            }
-                        </Box>
+                                <Grid item sx={{ ml: 2 }}>
+                                    <StyledLink to="/Adminregister">
+                                        Sign up
+                                    </StyledLink>
+                                </Grid>
+                            </Grid>
+                        }
                     </Box>
                 </Grid>
                 <Grid
