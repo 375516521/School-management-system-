@@ -19,9 +19,10 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json'
   },
-  withCredentials: true // necessary if backend uses cookies
+  withCredentials: true
 });
 
+// Utility to ensure clean URL paths
 const joinPath = (...parts) =>
   parts
     .map(p => String(p || '').trim().replace(/^\/+|\/+$/g, ''))
@@ -29,8 +30,12 @@ const joinPath = (...parts) =>
     .join('/');
 
 /**
- * Generic GET handler
+ * -------------------------------------------------------
+ * GENERIC HANDLERS
+ * -------------------------------------------------------
  */
+
+// Generic GET handler
 export const handleGet = async (dispatch, {
   path,
   requestAction,
@@ -55,13 +60,8 @@ export const handleGet = async (dispatch, {
   }
 };
 
-/**
- * Generic POST handler (useful for login)
- */
-export const handlePost = async ({
-  path,
-  payload
-}) => {
+// Generic POST handler (Login, etc.)
+export const handlePost = async ({ path, payload }) => {
   try {
     const res = await api.post(`/${joinPath(path)}`, payload);
     return res.data;
@@ -70,15 +70,26 @@ export const handlePost = async ({
   }
 };
 
-// Example: Login function
+/**
+ * -------------------------------------------------------
+ * AUTH RELATED
+ * -------------------------------------------------------
+ */
+
 export const loginUser = async (credentials) => {
   return await handlePost({
-    path: 'auth/login', // your backend login route
+    path: 'auth/login',
     payload: credentials
   });
 };
 
-// Example: Fetch all classes
+/**
+ * -------------------------------------------------------
+ * CLASS RELATED
+ * -------------------------------------------------------
+ */
+
+// Fetch all classes
 export const getAllSclasses = (id, address) => async (dispatch) => {
   await handleGet(dispatch, {
     path: `${address}List/${id}`,
@@ -88,7 +99,7 @@ export const getAllSclasses = (id, address) => async (dispatch) => {
   });
 };
 
-// Example: Fetch class students
+// Fetch class students
 export const getClassStudents = (id) => async (dispatch) => {
   await handleGet(dispatch, {
     path: `Sclass/Students/${id}`,
@@ -98,7 +109,7 @@ export const getClassStudents = (id) => async (dispatch) => {
   });
 };
 
-// Example: Fetch class details
+// Fetch single class details
 export const getClassDetails = (id, address) => async (dispatch) => {
   await handleGet(dispatch, {
     path: `${address}/${id}`,
@@ -108,10 +119,42 @@ export const getClassDetails = (id, address) => async (dispatch) => {
   });
 };
 
-// Example: Fetch subjects
+/**
+ * -------------------------------------------------------
+ * SUBJECT RELATED
+ * -------------------------------------------------------
+ */
+
+// Fetch subjects list
 export const getSubjectList = (id, address) => async (dispatch) => {
   await handleGet(dispatch, {
     path: `${address}/${id}`,
+    requestAction: fetchSubjectsStart,
+    successAction: fetchSubjectsSuccess,
+    failAction: fetchSubjectsFail
+  });
+};
+
+// ✅ Fetch subject details (added as requested)
+export const getSubjectDetails = (id, address) => async (dispatch) => {
+  await handleGet(dispatch, {
+    path: `${address}/${id}`,
+    requestAction: fetchDetailsStart,
+    successAction: fetchDetailsSuccess,
+    failAction: fetchDetailsFail
+  });
+};
+
+/**
+ * -------------------------------------------------------
+ * TEACHER RELATED
+ * -------------------------------------------------------
+ */
+
+// ✅ Fetch teacher free class subjects (added as requested)
+export const getTeacherFreeClassSubjects = (teacherId) => async (dispatch) => {
+  await handleGet(dispatch, {
+    path: `Teacher/FreeSubjects/${teacherId}`,
     requestAction: fetchSubjectsStart,
     successAction: fetchSubjectsSuccess,
     failAction: fetchSubjectsFail
